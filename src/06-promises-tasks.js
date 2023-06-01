@@ -28,8 +28,17 @@
  *      .catch((error) => console.log(error.message)) // 'Error: Wrong parameter is passed!
  *                                                    //  Ask her again.';
  */
-function willYouMarryMe(/* isPositiveAnswer */) {
-  throw new Error('Not implemented');
+function willYouMarryMe(isPositiveAnswer) {
+  return new Promise((resolve, reject) => {
+    if (typeof isPositiveAnswer !== 'boolean') {
+      reject(new Error('Wrong parameter is passed! Ask her again.'));
+    }
+    if (isPositiveAnswer) {
+      resolve('Hooray!!! She said "Yes"!');
+    } else {
+      resolve('Oh no, she said "No".');
+    }
+  });
 }
 
 
@@ -48,8 +57,22 @@ function willYouMarryMe(/* isPositiveAnswer */) {
  *    })
  *
  */
-function processAllPromises(/* array */) {
-  throw new Error('Not implemented');
+function processAllPromises(array) {
+  return new Promise((resolve, reject) => {
+    const result = [];
+    for (let i = 0; i < array.length; i += 1) {
+      array[i]
+        .then((data) => {
+          result[i] = data;
+          if (!result.includes(undefined) && result.length === array.length) {
+            resolve(result);
+          }
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    }
+  });
 }
 
 /**
@@ -71,8 +94,18 @@ function processAllPromises(/* array */) {
  *    })
  *
  */
-function getFastestPromise(/* array */) {
-  throw new Error('Not implemented');
+function getFastestPromise(array) {
+  return new Promise((resolve, reject) => {
+    for (let i = 0; i < array.length; i += 1) {
+      array[i]
+        .then((data) => {
+          resolve(data);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    }
+  });
 }
 
 /**
@@ -93,6 +126,37 @@ function getFastestPromise(/* array */) {
  *
  */
 function chainPromises(/* array, action */) {
+  // const result = [];
+  // return new Promise((resolve) => {
+  //   array.forEach((item) => {
+  //     try {
+  //       item.then((data) => {
+  //         result.push(data);
+  //         if (result.length === array.length) {
+  //           const dataActions = result.reduce(action);
+  //           resolve(dataActions);
+  //         }
+  //       });
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   });
+  // });
+  // return new Promise((resolve) => {
+  //   const result = [];
+  //   for (let i = 0; i < array.length; i += 1) {
+  //     array[i]
+  //       .then((data) => {
+  //         result[i] = data;
+  //         if (!result.includes(undefined) && result.length === array.length) {
+  //           resolve(result.reduce(action));
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         console.log(error);
+  //       });
+  //   }
+  // });
   throw new Error('Not implemented');
 }
 
