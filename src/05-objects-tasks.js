@@ -114,33 +114,112 @@ function fromJSON(proto, json) {
  *  For more examples see unit tests.
  */
 
+class CSSBuilder {
+  constructor() {
+    this.result = [];
+    this.countError = 'Element, id and pseudo-element should not occur more then one time inside the selector';
+    this.orderError = 'Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element';
+  }
+
+  element(value) {
+    this.result.forEach((item) => {
+      if (!item.includes('#') && !item.includes('.') && !item.includes(':') && !item.includes('::')) {
+        throw this.countError;
+      }
+    });
+    if (this.result.length !== 0) throw new Error(this.orderError);
+    this.result.push(value);
+    return this;
+  }
+
+  id(value) {
+    this.result.forEach((item) => {
+      if (item.includes('#')) throw this.countError;
+    });
+    this.result.push(`#${value}`);
+    const prevValue = this.result[this.result.length - 2];
+    if (prevValue && (prevValue.includes('.') || prevValue.includes(':') || prevValue.includes('::') || prevValue.includes('['))) {
+      throw new Error(this.orderError);
+    }
+    return this;
+  }
+
+  class(value) {
+    this.result.push(`.${value}`);
+    const prevValue = this.result[this.result.length - 2];
+    if (prevValue && (prevValue.includes(':') || prevValue.includes('::') || prevValue.includes('['))) {
+      throw new Error(this.orderError);
+    }
+    return this;
+  }
+
+  attr(value) {
+    this.result.push(`[${value}]`);
+    const prevValue = this.result[this.result.length - 2];
+    if (prevValue && (prevValue.includes(':') || prevValue.includes('::'))) {
+      throw new Error(this.orderError);
+    }
+    return this;
+  }
+
+  pseudoClass(value) {
+    this.result.push(`:${value}`);
+    const prevValue = this.result[this.result.length - 2];
+    if (prevValue && prevValue.includes('::')) {
+      throw new Error(this.orderError);
+    }
+    return this;
+  }
+
+  pseudoElement(value) {
+    this.result.forEach((item) => {
+      if (item.includes('::')) throw this.countError;
+    });
+    this.result.push(`::${value}`);
+    return this;
+  }
+
+  combine(selector1, combinator, selector2) {
+    this.result.push(selector1.result.join(''));
+    this.result.push(` ${combinator} `);
+    this.result.push(selector2.result.join(''));
+    return this;
+  }
+
+  stringify() {
+    const returnValue = [...this.result];
+    this.result = [];
+    return returnValue.join('');
+  }
+}
+
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  element(value) {
+    return new CSSBuilder().element(value);
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    return new CSSBuilder().id(value);
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    return new CSSBuilder().class(value);
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    return new CSSBuilder().attr(value);
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    return new CSSBuilder().pseudoClass(value);
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    return new CSSBuilder().pseudoElement(value);
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  combine(selector1, combinator, selector2) {
+    return new CSSBuilder().combine(selector1, combinator, selector2);
   },
 };
 
