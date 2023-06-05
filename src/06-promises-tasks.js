@@ -127,21 +127,21 @@ function getFastestPromise(array) {
  */
 function chainPromises(array, action) {
   const results = [];
-  let completed = 0;
 
   return new Promise((resolve) => {
-    array.forEach((item, index) => {
-      Promise.resolve(item)
-        .then((res) => {
-          results[index] = res;
-          completed += 1;
-
-          if (completed === array.length) {
-            resolve(results.reduce(action));
-          }
-        })
-        .catch(() => {});
+    const myPromise = new Promise((myResolve) => {
+      array.forEach((item, index) => {
+        item
+          .then((data) => {
+            results[index] = data;
+            if (results.length === array.length) {
+              myResolve(results);
+            }
+          }, () => {});
+      });
     });
+    const value = myPromise.then((data) => data.reduce(action));
+    resolve(value);
   });
 }
 
